@@ -47,35 +47,35 @@ public class Importes extends JRDefaultScriptlet{
             numero = numero + ",00";
         }
         //se valida formato de entrada -> 0,00 y 999 999 999,00
-        if (Pattern.matches("\\d{1,9},\\d{1,2}", numero)) {
+        if (Pattern.matches("\\d{1,12},\\d{1,2}", numero)) {
             //se divide el numero 0000000,00 -> entero y decimal
             String Num[] = numero.split(",");
             //de da formato al numero decimal
             parte_decimal = "con " + Num[1] + "/100";
             //se convierte el numero a literal
-            if (Integer.parseInt(Num[0]) == 0) {//si el valor es cero
+            if (Double.parseDouble(Num[0]) == 0) {//si el valor es cero
                 literal = "cero ";
-            } else if (Integer.parseInt(Num[0]) > 999999) {//si es millon
+            } else if (Double.parseDouble(Num[0]) > 999999) {//si es millon
                 literal = getMillones(Num[0]);
-            } else if (Integer.parseInt(Num[0]) > 999) {//si es miles
+            } else if (Double.parseDouble(Num[0]) > 999) {//si es miles
                 literal = getMiles(Num[0]);
-            } else if (Integer.parseInt(Num[0]) > 99) {//si es centena
+            } else if (Double.parseDouble(Num[0]) > 99) {//si es centena
                 literal = getCentenas(Num[0]);
-            } else if (Integer.parseInt(Num[0]) > 9) {//si es decena
+            } else if (Double.parseDouble(Num[0]) > 9) {//si es decena
                 literal = getDecenas(Num[0]);
             } else {//sino unidades -> 9
                 literal = getUnidades(Num[0]);
             }
 
             literal = literal.substring(0, 1).toUpperCase() + literal.substring(1);
-            //devuelve el resultado en centimos o minusculas
+            //devuelve el resultado con centimos o sin centimos
             if (centimos) {
                 return (literal + parte_decimal);
             } else {
                 return (literal);
             }
-        } else {//error, no se puede numeroATexto
-            return literal = null;
+        } else {//error, no es un numero o supera la cantidad de 12 digitos 999 999 999 999
+            return literal = numero;
         }
     }
 
@@ -135,12 +135,14 @@ public class Importes extends JRDefaultScriptlet{
         //se obtiene los millones
         String millon = numero.substring(0, numero.length() - 6);
         String n = "";
-        if (millon.length() > 1) {
+        if (millon.length() > 3) {
+            n = getMiles(millon) + "millones ";
+        } else if (millon.length() > 1) {
             n = getCentenas(millon) + "millones ";
         } else {
-            n = getUnidades(millon) + "millon ";
+            n = getUnidades(millon) + (Integer.parseInt(millon) == 1 ? "millon " : "millones ");
         }
         return n + getMiles(miles);
     }
-
+    
 }
