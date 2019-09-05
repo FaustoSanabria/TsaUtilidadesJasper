@@ -7,19 +7,20 @@ import net.sf.jasperreports.engine.JRScriptletException;
 /**
  *
  * @author fsanabria
- * @version 0.1
+ * @version 0.1.1
  *
  */
 public class Importes extends JRDefaultScriptlet{
 
     private static final String[] UNIDADES = {"", "un ", "dos ", "tres ", "cuatro ", "cinco ", "seis ", 
         "siete ", "ocho ", "nueve "};
-    private static final String[] DECENAS = {"diez ", "once ", "doce ", "trece ", "catorce ", "quince ", "dieciseis ",
-        "diecisiete ", "dieciocho ", "diecinueve", "veinte ", "treinta ", "cuarenta ",
-        "cincuenta ", "sesenta ", "setenta ", "ochenta ", "noventa "};
+    private static final String[] DECENAS = {"diez ", "once ", "doce ", "trece ", "catorce ", 
+        "quince ", "dieciseis ", "diecisiete ", "dieciocho ", "diecinueve", 
+        "veinte ", "veintiun ", "veintidos ", "veintitres ", "veinticuatro ", 
+        "veinticinco ", "veintiseis ", "veintisiete ", "veintiocho ", "veintinueve ", 
+        "treinta ", "cuarenta ", "cincuenta ", "sesenta ", "setenta ", "ochenta ", "noventa "};
     private static final String[] CENTENAS = {"", "ciento ", "doscientos ", "trecientos ", "cuatrocientos ", 
-        "quinientos ", "seiscientos ",
-        "setecientos ", "ochocientos ", "novecientos "};
+        "quinientos ", "seiscientos ", "setecientos ", "ochocientos ", "novecientos "};
 
    
     /**
@@ -47,7 +48,7 @@ public class Importes extends JRDefaultScriptlet{
             numero = numero + ",00";
         }
         //se valida formato de entrada -> 0,00 y 999 999 999,00
-        if (Pattern.matches("\\d{1,12},\\d{1,2}", numero)) {
+        if (Pattern.matches("\\d{1,15},\\d{1,2}", numero)) {
             //se divide el numero 0000000,00 -> entero y decimal
             String Num[] = numero.split(",");
             //de da formato al numero decimal
@@ -55,6 +56,8 @@ public class Importes extends JRDefaultScriptlet{
             //se convierte el numero a literal
             if (Double.parseDouble(Num[0]) == 0) {//si el valor es cero
                 literal = "cero ";
+            } else if (Double.parseDouble(Num[0]) > 999999999999d) {
+                literal = getBillones(Num[0]);
             } else if (Double.parseDouble(Num[0]) > 999999) {//si es millon
                 literal = getMillones(Num[0]);
             } else if (Double.parseDouble(Num[0]) > 999) {//si es miles
@@ -89,13 +92,15 @@ public class Importes extends JRDefaultScriptlet{
         int n = Integer.parseInt(num);
         if (n < 10) {//para casos como -> 01 - 09
             return getUnidades(num);
-        } else if (n > 19) {//para 20...99
+        } else if (n > 29) {//para 30...99
             String u = getUnidades(num);
             if (u.equals("")) { //para 20,30,40,50,60,70,80,90
-                return DECENAS[Integer.parseInt(num.substring(0, 1)) + 8];
+                return DECENAS[Integer.parseInt(num.substring(0, 1)) + 17];
             } else {
-                return DECENAS[Integer.parseInt(num.substring(0, 1)) + 8] + "y " + u;
+                return DECENAS[Integer.parseInt(num.substring(0, 1)) + 17] + "y " + u;
             }
+        } else if (n > 19) { // para 20..29
+            return DECENAS[Integer.parseInt(num.substring(0, 2)) - 10];
         } else {//numeros entre 11 y 19
             return DECENAS[n - 10];
         }
@@ -133,16 +138,27 @@ public class Importes extends JRDefaultScriptlet{
         //se obtiene los miles
         String miles = numero.substring(numero.length() - 6);
         //se obtiene los millones
-        String millon = numero.substring(0, numero.length() - 6);
+        String millones = numero.substring(0, numero.length() - 6);
         String n = "";
-        if (millon.length() > 3) {
-            n = getMiles(millon) + "millones ";
-        } else if (millon.length() > 1) {
-            n = getCentenas(millon) + "millones ";
+        if (millones.length() > 3) {
+            n = getMiles(millones) + "millones ";
+        } else if (millones.length() > 1) {
+            n = getCentenas(millones) + "millones ";
         } else {
-            n = getUnidades(millon) + (Integer.parseInt(millon) == 1 ? "millon " : "millones ");
+            n = getUnidades(millones) + (Integer.parseInt(millones) == 1 ? "millon " : "millones ");
         }
         return n + getMiles(miles);
     }
     
+    private String getBillones(String numero) {
+        String millones = numero.substring(numero.length() - 12);
+        String billones = numero.substring(0, numero.length() - 12);
+        String n = "";
+        if (billones.length() > 1) {
+            n = getCentenas(billones) + "billones ";
+        } else {
+            n = getUnidades(billones) + (Integer.parseInt(billones) == 1 ? "billon " : "billones ");
+        }
+        return n + getMillones(millones);
+    }
 }
