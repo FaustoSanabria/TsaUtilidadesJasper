@@ -20,6 +20,7 @@
             version="true"
             use="true"
             windowtitle="TsaUtilidadesJasper"
+            nonavbar="true"
         >
             <doctitle><![CDATA[<h1>TsaUtilidadesJasper</h1>]]></doctitle>
             <tag name="todo" scope="all" description="To do:"/>
