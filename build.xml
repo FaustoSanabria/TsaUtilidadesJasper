@@ -19,7 +19,7 @@
             author="true"
             version="true"
             use="true"
-            windowtitle="The name of your API"
+            windowtitle="TsaUtilidadesJasper"
         >
             <doctitle><![CDATA[<h1>TsaUtilidadesJasper</h1>]]></doctitle>
             <tag name="todo" scope="all" description="To do:"/>
